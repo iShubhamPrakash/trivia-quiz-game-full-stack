@@ -6,10 +6,20 @@ from flask_cors import CORS
 import random
 
 from models import setup_db, Question, Category
-print("Hello")
-print(sys.path)
+# print("Hello")
+# print(sys.path)
 
 QUESTIONS_PER_PAGE = 10
+
+# A function which will return paginated question
+def paginate_questions(total_questions, page):
+  start = (page - 1) * QUESTIONS_PER_PAGE
+  end = start + QUESTIONS_PER_PAGE
+
+  questions = [question.format() for question in total_questions]
+  question_set = questions[start:end]
+
+  return question_set
 
 def create_app(test_config=None):
   # create and configure the app
@@ -41,9 +51,8 @@ def create_app(test_config=None):
   def test():
     return 'working'
 
-
   '''
-  @TODO:
+  @TODO:                                                                                                    DONE
   Create an endpoint to handle GET requests for questions,
   including pagination (every 10 questions).
   This endpoint should return a list of questions,
@@ -54,6 +63,35 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions.
   '''
+
+  @app.route('/questions')
+  def get_questions():
+    # Get the page value from the query parameter
+    page = request.args.get('page', 1, type=int)
+    # get all te question from the database
+    all_questions= Question.query.all()
+    total_questions= len(all_questions)
+    # Create a set of questions based on the page no
+    question_set= paginate_questions(all_questions,page)
+
+    # get all categories
+    all_categories = Category.query.all()
+    categories = {}
+    for category in all_categories:
+        categories[category.id] = category.type
+
+    # abort if no questions
+    if (len(question_set) == 0):
+        abort(404)
+
+    # return data to the client
+    return jsonify({
+        'success': True,
+        'questions': question_set,
+        'total_questions': total_questions,
+        'categories': categories
+    })
+
 
   '''
   @TODO:
