@@ -79,7 +79,6 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions.
   '''
-
   @app.route('/questions')
   def get_questions():
     # Get the page value from the query parameter
@@ -197,7 +196,26 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that
   category to be shown.
   '''
+  @app.route('/categories/<int:id>/questions')
+  def get_questions_by_category(id):
+    # get the category by id from the database
+    category = Category.query.filter_by(id=id).one_or_none()
 
+    # abort 404 if category not found
+    if (category is None):
+      abort(404)
+
+    # get filtered question from the database
+    all_questions = Question.query.filter_by(category=category.id).all()
+    questions= [question.format() for question in all_questions]
+
+    # return the results to the client
+    return jsonify({
+      'success': True,
+      'questions': questions,
+      'total_questions': len(all_questions),
+      'current_category': category.type
+    })
 
   '''
   @TODO:
