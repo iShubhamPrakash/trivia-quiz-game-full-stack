@@ -15,7 +15,7 @@ QUESTIONS_PER_PAGE = 10
 def paginate_questions(total_questions, page):
   start = (page - 1) * QUESTIONS_PER_PAGE
   end = start + QUESTIONS_PER_PAGE
-
+  # Generating list of formatted questions
   questions = [question.format() for question in total_questions]
   question_set = questions[start:end]
 
@@ -150,8 +150,9 @@ def create_app(test_config=None):
   of the questions list in the "List" tab.
   '''
 
+
   '''
-  @TODO:
+  @TODO:                                                                           DONE
   Create a POST endpoint to get questions based on a search term.
   It should return any questions for whom the search term
   is a substring of the question.
@@ -160,6 +161,33 @@ def create_app(test_config=None):
   only question that include that string within their question.
   Try using the word "title" to start.
   '''
+  @app.route('/questions/search', methods=['POST'])
+  def search_questions():
+    body = request.get_json()
+    search_term = body.get('searchTerm', None)
+
+    # abort if searchTerm is empty
+    if not search_term:
+      abort(404)
+
+    # Search questions in the database
+    search_results = Question.query.filter(
+        Question.question.ilike(f'%{search_term}%')).all()
+
+     # Abort 404 if no results found in the database
+    if (len(search_results) == 0):
+      abort(404)
+
+    # Format the search result
+    questions=[question.format() for question in search_results]
+
+    # Send response to the client
+    return jsonify({
+      'success': True,
+      'questions': questions,
+      'total_questions': len(search_results),
+      'current_category': None
+    })
 
   '''
   @TODO:
