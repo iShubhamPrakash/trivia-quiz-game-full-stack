@@ -41,9 +41,7 @@ def create_app(test_config=None):
 
   @app.route('/test')
   def test():
-    question = Question(question='new_question', answer='new_answer',category=1, difficulty=1,)
-    question.insert()
-    return 'working'
+    return 'Hello world. server is up and running...'
 
   '''
   Create an endpoint to handle GET requests
