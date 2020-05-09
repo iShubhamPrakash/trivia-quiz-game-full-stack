@@ -27,12 +27,11 @@ def create_app(test_config=None):
   setup_db(app)
 
   '''
-  @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs             DONE
+    Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs             DONE
   '''
   cors = CORS(app)
 
   '''
-  @TODO: Use the after_request decorator to set Access-Control-Allow                                        DONE
   '''
   @app.after_request
   def after_request(response):
@@ -47,7 +46,6 @@ def create_app(test_config=None):
     return 'working'
 
   '''
-  @TODO:                                                                                                    DONE
   Create an endpoint to handle GET requests
   for all available categories.
   '''
@@ -70,7 +68,6 @@ def create_app(test_config=None):
     })
 
   '''
-  @TODO:                                                                                                    DONE
   Create an endpoint to handle GET requests for questions,
   including pagination (every 10 questions).
   This endpoint should return a list of questions,
@@ -111,7 +108,6 @@ def create_app(test_config=None):
 
 
   '''
-  @TODO:                                                                                    DONE
   Create an endpoint to DELETE question using a question ID.
 
   TEST: When you click the trash icon next to a question, the question will be removed.
@@ -141,7 +137,6 @@ def create_app(test_config=None):
       abort(422)
 
   '''
-  @TODO:                                                      DONE
   Create an endpoint to POST a new question,
   which will require the question and answer text,
   category, and difficulty score.
@@ -181,7 +176,6 @@ def create_app(test_config=None):
       abort(422)
 
   '''
-  @TODO:                                                                           DONE
   Create a POST endpoint to get questions based on a search term.
   It should return any questions for whom the search term
   is a substring of the question.
@@ -219,7 +213,6 @@ def create_app(test_config=None):
     })
 
   '''
-  @TODO:                                                                             DONE
   Create a GET endpoint to get questions based on category.
 
   TEST: In the "List" tab / main screen, clicking on one of the
@@ -248,7 +241,6 @@ def create_app(test_config=None):
     })
 
   '''
-  @TODO:
   Create a POST endpoint to get questions to play the quiz.
   This endpoint should take category and previous question parameters
   and return a random questions within the given category,
@@ -258,9 +250,43 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not.
   '''
+  @app.route('/quizzes', methods=['POST'])
+  def start_quiz():
+    try:
+      body = request.get_json()
+      # validate if body contains required fields
+      if not ('quiz_category' in body and 'previous_questions' in body):
+        abort(422)
+
+      category = body.get('quiz_category')
+      previous_questions = body.get('previous_questions')
+
+      # To make sure no question is repeated and everytime a new question is shown to the user
+      if category['type'] == 'click':
+        available_questions = Question.query.filter(
+            Question.id.notin_((previous_questions))).all()
+      else:
+        available_questions = Question.query.filter_by(
+            category=category['id']).filter(Question.id.notin_((previous_questions))).all()
+
+      # Generate a random index between range 0 and the length of available_questions
+      random_index=random.randrange(0, len(available_questions))
+
+      # take a random question
+      if len(available_questions) > 0:
+        new_question = available_questions[random_index].format()
+      else:
+        new_question=None
+
+      # Return response to the client
+      return jsonify({
+        'success': True,
+        'question': new_question
+      })
+    except:
+      abort(422)
 
   '''
-  @TODO:                                                          DONE
   Create error handlers for all expected errors
   including 404 and 422.
   '''
