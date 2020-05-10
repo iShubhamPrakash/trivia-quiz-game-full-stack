@@ -71,7 +71,8 @@ class QuizView extends Component {
         return;
       },
       error: (error) => {
-        alert('Unable to load question. Please try your request again')
+        alert('No more questions available...')
+        this.setState({forceEnd:true})
         return;
       }
     })
