@@ -6,10 +6,26 @@
 .categories-list {
   flex-basis: 25%;
   flex-shrink: 2;
+  background: rgb(133, 183, 216);
+  min-height: 100vh;
 }
 
 .categories-list > form {
   width: 60%;
+}
+
+.categories-list li{
+  padding: 0.5em;
+  margin: 0;
+  cursor: pointer;
+}
+
+.categories-list li:hover{
+  background: pink;
+}
+
+.search-input{
+  padding: 0.5em;
 }
 
 .questions-list {
