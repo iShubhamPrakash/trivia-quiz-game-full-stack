@@ -254,7 +254,7 @@ def create_app(test_config=None):
       body = request.get_json()
       # validate if body contains required fields
       if not ('quiz_category' in body and 'previous_questions' in body):
-        abort(422)
+        abort(400)
 
       category = body.get('quiz_category')
       previous_questions = body.get('previous_questions')
